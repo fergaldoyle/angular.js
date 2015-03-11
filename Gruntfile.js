@@ -17,10 +17,6 @@ module.exports = function(grunt) {
   NG_VERSION.cdn = versionInfo.cdnVersion;
   var dist = 'angular-'+ NG_VERSION.full;
 
-  //global beforeEach
-  util.init();
-
-
   //config
   grunt.initConfig({
     NG_VERSION: NG_VERSION,
@@ -290,6 +286,10 @@ module.exports = function(grunt) {
     },
 
     shell: {
+      "npm-install": {
+        command: path.normalize('scripts/npm/install-dependencies.sh')
+      },
+
       "promises-aplus-tests": {
         options: {
           stdout: false,
@@ -315,6 +315,11 @@ module.exports = function(grunt) {
       }
     }
   });
+
+  // global beforeEach task
+  if (!process.env.TRAVIS) {
+    grunt.task.run('shell:npm-install');
+  }
 
   //alias tasks
   grunt.registerTask('test', 'Run unit, docs and e2e tests with Karma', ['jshint', 'jscs', 'package','test:unit','test:promises-aplus', 'tests:docs', 'test:protractor']);

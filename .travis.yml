@@ -2,6 +2,12 @@ language: node_js
 node_js:
   - '0.10'
 
+cache:
+  directories:
+    - node_modules
+    - bower_components
+    - docs/bower_components
+
 branches:
   except:
     - /^g3_.*$/
@@ -27,15 +33,21 @@ env:
 matrix:
   allow_failures:
     - env: "JOB=unit BROWSER_PROVIDER=browserstack"
+    - env: "JOB=docs-e2e BROWSER_PROVIDER=browserstack"
+    - env: "JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=browserstack"
+    - env: "JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=browserstack"
 
 install:
+  # Check the size of caches
+  - du -sh ./node_modules ./bower_components/ ./docs/bower_components/ || true
   # - npm config set registry http://23.251.144.68
   # Disable the spinner, it looks bad on Travis
   - npm config set spin false
   # Log HTTP requests
   - npm config set loglevel http
-  - time ./scripts/travis/npm-bundle-deps.sh
-  - time npm install
+  - npm install -g npm@2.5
+  # Instal npm dependecies and ensure that npm cache is not stale
+  - scripts/npm/install-dependencies.sh
 
 before_script:
   - mkdir -p $LOGS_DIR
