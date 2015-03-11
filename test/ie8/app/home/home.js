@@ -1,6 +1,7 @@
 angular.module('ie8Test.home', []).controller('homeCtrl', function ($scope, $filter) {
 
   $scope.message = 'This is the home view';
+  $scope.messageHTML = '<strong>This is the home view</strong>';
 
   $scope.name = 'Foo';
 
