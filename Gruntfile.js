@@ -318,7 +318,7 @@ module.exports = function(grunt) {
 
   // global beforeEach task
   if (!process.env.TRAVIS) {
-    grunt.task.run('shell:npm-install');
+    //grunt.task.run('shell:npm-install');
   }
 
   //alias tasks
