@@ -72,28 +72,55 @@
     };
   }
 
-  // https://github.com/usmonster/aight/blob/master/js/element-properties.js
+  // textContent shim using Sizzle / jQuery get & set text methods
   (function () {
-    try {
-      // from Eli Grey @ http://eligrey.com/blog/post/textcontent-in-ie8
-      if (Object.defineProperty && Object.getOwnPropertyDescriptor &&
-        Object.getOwnPropertyDescriptor(Element.prototype, "textContent") &&
-        !Object.getOwnPropertyDescriptor(Element.prototype, "textContent").get) {
-        var innerText = Object.getOwnPropertyDescriptor(Element.prototype, "innerText");
-        Object.defineProperty(Element.prototype, "textContent", {
-          // It won't work if you just drop in innerText.get
-          // and innerText.set or the whole descriptor.
-          get: function () {
-            return innerText.get.call(this);
-          },
-          set: function (x) {
-            return innerText.set.call(this, x);
-          }
-        });
+
+    var getText = function (elem) {
+      var node,
+        ret = '',
+        i = 0,
+        nodeType = elem.nodeType;
+
+      if (!nodeType) {
+        // If no nodeType, this is expected to be an array
+        while ((node = elem[i++])) {
+          // Do not traverse comment nodes
+          ret += getText(node);
+        }
+      } else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
+        // Traverse its children
+        for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
+          ret += getText(elem);
+        }
+      } else if (nodeType === 3 || nodeType === 4) {
+        return elem.nodeValue;
       }
-    } catch (e) {
-      // bad Firefox
+      // Do not include comment or processing instruction nodes
+
+      return ret;
+    };
+
+    if (Object.defineProperty && Object.getOwnPropertyDescriptor &&
+      Object.getOwnPropertyDescriptor(Element.prototype, 'textContent') &&
+      !Object.getOwnPropertyDescriptor(Element.prototype, 'textContent').get) {
+      var innerText = Object.getOwnPropertyDescriptor(Element.prototype, 'innerText');
+      Object.defineProperty(Element.prototype, 'textContent', {
+        get: function () {
+          return getText(this);
+        },
+        set: function (x) {
+          //var $this = $(this);
+          //return $this.empty().append(($this[0] && $this[0].ownerDocument || document).createTextNode(x));
+          // empty
+          while (this.hasChildNodes()) {
+            this.removeChild(this.lastChild);
+          }
+          // add text node
+          return this.appendChild((this && this.ownerDocument || document).createTextNode(x));
+        }
+      });
     }
+
   })();
 
   // ------ addEventListener ------
@@ -115,12 +142,13 @@
     }]);
 
       // http://msdn.microsoft.com/en-us/library/ie/hh180173%28v=vs.85%29.aspx
-      if(type === 'load' && this.tagName && this.tagName === 'SCRIPT') {
+      if (type === 'load' && this.tagName && this.tagName === 'SCRIPT') {
         var reg = registry[0][3];
-        this.onreadystatechange = function(event)
-        {
-          if( this.readyState === "loaded" || this.readyState === "complete" ) {
-            reg.call(this, { type : "load" });
+        this.onreadystatechange = function (event) {
+          if (this.readyState === "loaded" || this.readyState === "complete") {
+            reg.call(this, {
+              type: "load"
+            });
           }
         }
       } else {
@@ -130,7 +158,7 @@
     WindowPrototype[removeEventListener] = DocumentPrototype[removeEventListener] = ElementPrototype[removeEventListener] = function (type, listener) {
       for (var index = 0, register; register = registry[index]; ++index) {
         if (register[0] == this && register[1] == type && register[2] == listener) {
-          if(type === 'load' && this.tagName && this.tagName === 'SCRIPT') {
+          if (type === 'load' && this.tagName && this.tagName === 'SCRIPT') {
             this.onreadystatechange = null;
           }
 

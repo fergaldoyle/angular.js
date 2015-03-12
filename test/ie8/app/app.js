@@ -95,4 +95,8 @@
     };
   });
 
+  var $p = $('<p />').text('checking textContent');
+  console.log($p[0].textContent);
+
+
 }());

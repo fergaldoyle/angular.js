@@ -36,6 +36,10 @@ angular.module('ie8Test.directives', [])
     restrict: 'EAC',
     template: '<span></span>',
     link: function (scope, elm, attrs) {
+
+      var foo = angular.element('<div>{{a=123}}xxx</div>');
+      console.log(foo.html());
+
       setTimeout(function () {
         var element = $compile(angular.element('<div>{{a=123}}</div>'))($rootScope);
         $rootScope.$digest();
