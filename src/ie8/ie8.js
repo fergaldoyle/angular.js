@@ -29,16 +29,25 @@
         out = {
           isFake: true,
           send: function (a) {
-            xmlhttp.send(a);
+            return xmlhttp.send(a);
           },
           open: function (a, b, c, d, e) {
-            xmlhttp.open(a, b, c, d, e);
+            return xmlhttp.open(a, b, c, d, e);
+          },
+          abort: function () {
+            return xmlhttp.abort();
           },
           setRequestHeader: function (a, b) {
-            xmlhttp.setRequestHeader(a, b);
+            return xmlhttp.setRequestHeader(a, b);
+          },
+          getResponseHeader: function (a) {
+            return xmlhttp.getResponseHeader(a);
           },
           getAllResponseHeaders: function () {
             return xmlhttp.getAllResponseHeaders();
+          },
+          overrideMimeType: function (a) {
+            return xmlhttp.overrideMimeType(a);
           }
         };
 
