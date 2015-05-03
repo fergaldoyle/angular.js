@@ -48,6 +48,15 @@ describe('Filter: filter', function() {
   });
 
 
+  it('should ignore undefined properties of the expression object', function() {
+    var items = [{name: 'a'}, {name: 'abc'}];
+    expect(filter(items, {name: undefined})).toEqual([{name: 'a'}, {name: 'abc'}]);
+
+    items = [{first: 'misko'}, {deep: {first: 'misko'}}, {deep: {last: 'hevery'}}];
+    expect(filter(items, {deep: {first: undefined}})).toEqual([{deep: {first: 'misko'}}, {deep: {last: 'hevery'}}]);
+  });
+
+
   it('should take function as predicate', function() {
     var items = [{name: 'a'}, {name: 'abc', done: true}];
     expect(filter(items, function(i) {return i.done;}).length).toBe(1);
@@ -396,6 +405,33 @@ describe('Filter: filter', function() {
     expect(filter(items, 'll')[0]).toBe(items[0]);
 
     delete Object.prototype.someProp;
+  });
+
+
+  it('should not throw an error if property is null when comparing object', function() {
+      var items = [
+          { office:1, people: {name:'john'}},
+          { office:2, people: {name:'jane'}},
+          { office:3, people: null}
+      ];
+      var f = { };
+      expect(filter(items, f).length).toBe(3);
+
+      f = { people:null };
+      expect(filter(items, f).length).toBe(1);
+
+      f = { people: {}};
+      expect(filter(items, f).length).toBe(2);
+
+      f = { people:{ name: '' }};
+      expect(filter(items, f).length).toBe(2);
+
+      f = { people:{ name:'john' }};
+      expect(filter(items, f).length).toBe(1);
+
+      f = { people:{ name:'j' }};
+      expect(filter(items, f).length).toBe(2);
+
   });
 
 
