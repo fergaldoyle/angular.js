@@ -21,6 +21,51 @@
   }
 
   // ie8 ftw...
+  if (!window.XMLHttpRequest) {
+    //console.log('XMLHttpRequest not enabled');
+
+    window.XMLHttpRequest = function () {
+      var xmlhttp = new ActiveXObject('Microsoft.XMLHTTP'),
+        out = {
+          isFake: true,
+          send: function (a) {
+            xmlhttp.send(a);
+          },
+          open: function (a, b, c, d, e) {
+            xmlhttp.open(a, b, c, d, e);
+          },
+          setRequestHeader: function (a, b) {
+            xmlhttp.setRequestHeader(a, b);
+          },
+          getAllResponseHeaders: function () {
+            return xmlhttp.getAllResponseHeaders();
+          }
+        };
+
+      xmlhttp.onreadystatechange = function () {
+        out.readyState = xmlhttp.readyState;
+
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+          out.status = xmlhttp.status;
+          out.responseText = xmlhttp.responseText;
+          out.responseXML = xmlhttp.responseXML;
+          out.statusText = xmlhttp.statusText;
+
+          if (out.onload) {
+            out.onload.apply(this, arguments);
+          }
+        }
+
+        if (out.onreadystatechange) {
+          out.onreadystatechange.apply(this, arguments);
+        }
+
+      };
+
+      return out;
+
+    };
+  }
 
   // ------ XMLHttpRequest.onload ------
   // monkey patch XMLHttpRequest to make IE8 call onload when readyState === 4
