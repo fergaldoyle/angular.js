@@ -228,8 +228,12 @@ module.exports = function(grunt) {
         src: util.wrap(files['angularModules']['ngAria'], 'module')
       },
       "promises-aplus-adapter": {
-        dest:'tmp/promises-aplus-adapter++.js',
-        src:['src/ng/q.js','lib/promises-aplus/promises-aplus-test-adapter.js']
+        dest: 'tmp/promises-aplus-adapter++.js',
+        src: ['src/ng/q.js', 'lib/promises-aplus/promises-aplus-test-adapter.js']
+      },
+      angularie8: {
+        dest: 'build/ie8/angular.js',
+        src: ['src/ie8/ie8.js', 'build/angular.js', 'src/ie8/style.js'],
       }
     },
 
@@ -245,7 +249,8 @@ module.exports = function(grunt) {
       resource: 'build/angular-resource.js',
       route: 'build/angular-route.js',
       sanitize: 'build/angular-sanitize.js',
-      aria: 'build/angular-aria.js'
+      aria: 'build/angular-aria.js',
+      angularie8: 'build/ie8/angular.js'
     },
 
 
@@ -332,7 +337,7 @@ module.exports = function(grunt) {
 
   // global beforeEach task
   if (!process.env.TRAVIS) {
-    grunt.task.run('shell:npm-install');
+    // grunt.task.run('shell:npm-install');
   }
 
   //alias tasks

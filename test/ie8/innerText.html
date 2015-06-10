@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta charset="utf-8" />
+  <title>AngularJS 1.3 IE8 smoke test</title>
+
+  <!--[if IE 8]>
+    <script src="app/lib/es5-shim.js"></script>
+  <![endif]-->
+
+  <!--Useful-->
+  <!--[if IE 8]>
+    <script src="app/lib/console-shim.min.js"></script>
+
+  <![endif]-->
+  <!--<script src="app/lib/jquery-1.11.1.min.js"></script>-->
+  <script src="app/lib/jquery-1.11.1.min.js"></script>
+  <script>
+
+    // textContent shim using Sizzle / jQuery get & set text methods
+    (function () {
+
+      var getText = function (elem) {
+        var node,
+          ret = '',
+          i = 0,
+          nodeType = elem.nodeType;
+
+        if (!nodeType) {
+          // If no nodeType, this is expected to be an array
+          while ((node = elem[i++])) {
+            // Do not traverse comment nodes
+            ret += getText(node);
+          }
+        } else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
+          // Traverse its children
+          for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
+            ret += getText(elem);
+          }
+        } else if (nodeType === 3 || nodeType === 4) {
+          return elem.nodeValue;
+        }
+        // Do not include comment or processing instruction nodes
+
+        return ret;
+      };
+
+      if (Object.defineProperty && Object.getOwnPropertyDescriptor &&
+        Object.getOwnPropertyDescriptor(Element.prototype, 'textContent') &&
+        !Object.getOwnPropertyDescriptor(Element.prototype, 'textContent').get) {
+        var innerText = Object.getOwnPropertyDescriptor(Element.prototype, 'innerText');
+        Object.defineProperty(Element.prototype, 'textContent', {
+          get: function () {
+            return getText(this);
+          },
+          set: function (x) {
+            // empty
+            this.innerHTML = '';
+            // add text node
+            return this.appendChild((this && this.ownerDocument || document).createTextNode(x));
+          }
+        });
+      }
+
+    })();
+  </script>
+
+</head>
+
+<body>
+
+  <p id="one">One</p>
+  <p id="two" style="display:none">Two</p>
+  <span id="three">Three</span>
+
+  <script>
+    console.clear();
+    console.log(document.getElementById('one').textContent);
+    console.log(document.getElementById('two').textContent);
+    console.log(document.getElementById('three').textContent);
+    console.log(document.getElementById('three').textContent = '<p><strong>chan</strong>gexxxd</p>');
+    console.log(document.getElementById('three').textContent);
+    var div = document.createElement('div');
+    div.textContent = 'non dom element<p>sss</p>';
+    console.log(div.textContent);
+  </script>
+
+
+</body>
+
+</html>
